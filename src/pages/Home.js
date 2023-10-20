@@ -13,6 +13,52 @@ function Home() {
   }
 
   const [users, setUsers] = useState([]);
+    const fetchInfo =async() => { 
+        try{
+            await axios.get('http://localhost:8080/api/user/allUser').then((res) =>{
+                console.log("Ayush",res.data)
+                fetchInfoByID(res.data[0].id)
+                setUsers(res.data);
+            });
+        }catch{
+            window.alert("Error 404 page not found")
+            console.log();
+        }
+    }
+    const [userById,setUserById] = useState({
+      name : "",
+      device : "",
+      phone : "",
+      pid : "",
+      plan : {
+        name : "",
+        price : ""
+      }
+    });
+    const fetchInfoByID =async(value) => {
+      try{
+          await axios.get(`http://localhost:8080/api/user/userById/${value}`).then((res) =>{
+              console.log("AyushbyId",res.data)
+              setUserById(res.data);
+          });
+      }catch{
+          window.alert("Error 404 page not found")
+          console.log();
+      }
+  }
+    useEffect(() => {
+      fetchInfo(); 
+}, [])
+
+var currId;
+const handle = (e) =>{
+ console.log(e.target.value)
+ currId = e.target.value;
+ fetchInfoByID(e.target.value);
+
+}
+
+  console.log(users);
   return (
     <div className="wrapper">
       <div className="p-s rectangle-copy-5">
@@ -62,18 +108,19 @@ function Home() {
         </div>
         <div className="rectangle"></div>
 
-        <select className="subscription-dropdown">
-          <option value="apple">Apple</option>
-          <option value="banana">Banana</option>
-          <option value="cherry">Cherry</option>
-          <option value="grape">Grape</option>
-          <option value="orange">Orange</option>
+        <select className="subscription-dropdown" onChange={handle}>
+          {
+                users.map((curUser,index)=>{
+                 return <option key={index} value={curUser.id}>{curUser.name}</option>
+              })
+            
+          }
         </select>
 
         <div className="price">
           <div className="firstDiv">
             <div className="indicators-tags-default">Active</div>
-            <div className="thisprice">$35.5</div>
+            <div className="thisprice">${userById.plan.price}</div>
           </div>
           <div className="secondDiv">
             <icon>
@@ -88,7 +135,7 @@ function Home() {
           <icon>
             <BiSolidLayer />
           </icon>
-          <span className="grp-des">Silver Mobile Plan Name</span>
+          <span className="grp-des">{userById.plan.name}</span>
           <span className="grp-action" onClick={clickHandler}>
             Change
           </span>
@@ -97,7 +144,7 @@ function Home() {
           <icon>
             <AiFillMobile />
           </icon>
-          <span className="grp-des">Silver Mobile Plan Name</span>
+          <span className="grp-des">{userById.device}</span>
           <span className="grp-action" onClick={clickHandler}>
             Change
           </span>
@@ -106,7 +153,7 @@ function Home() {
           <icon>
             <BsFillPuzzleFill />
           </icon>
-          <span className="grp-des">Silver Mobile Plan Name</span>
+          <span className="grp-des">Add-ons(5)</span>
           <span className="grp-action" onClick={clickHandler}>
             Change
           </span>
